@@ -14,9 +14,19 @@ namespace curriculo_gamer_pt2.Services
         }
         public JogoJogado Atualizar(JogoJogado jogoJogado)
         {
+            var jogoIdValido = _context.Jogos.Find(jogoJogado.JogoId);
+            if (jogoIdValido == null)
+                throw new ObjectNotFoundException("Jogo não encontrado");
+
+            var userIdValido = _context.Users.Find(jogoJogado.UserId);
+            if (userIdValido == null)
+                throw new ObjectNotFoundException("Usuário não encontrado");
+
             var jogoJogadoExistente = BuscarPorId(jogoJogado.Id);
-            if(jogoJogadoExistente == null)
+
+            if (jogoJogadoExistente == null)
                 throw new ObjectNotFoundException("Jogo jogado não encontrado");
+
             jogoJogadoExistente.HorasJogadas = jogoJogado.HorasJogadas;
             jogoJogadoExistente.StatusJogo = jogoJogado.StatusJogo;
             _context.SaveChanges();
@@ -40,6 +50,15 @@ namespace curriculo_gamer_pt2.Services
 
         public JogoJogado Incluir(JogoJogado jogoJogado)
         {
+            var jogoIdValido = _context.Jogos.Find(jogoJogado.JogoId);
+            var userIdValido = _context.Users.Find(jogoJogado.UserId);
+
+            if(jogoIdValido == null)
+                throw new ObjectNotFoundException("Jogo não encontrado");
+
+            if(userIdValido == null)
+                throw new ObjectNotFoundException("Usuário não encontrado");
+
             _context.JogosJogados.Add(jogoJogado);
             _context.SaveChanges();
             return jogoJogado;

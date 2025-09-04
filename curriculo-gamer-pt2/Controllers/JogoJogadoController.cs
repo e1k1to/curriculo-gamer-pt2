@@ -44,8 +44,15 @@ namespace curriculo_gamer_pt2.Controllers
                 HorasJogadas = jogoJogadoDto.HorasJogadas,
                 StatusJogo = jogoJogadoDto.StatusJogo,
             };
-            _jogoJogadoService.Incluir(novoJogoJogado);
-            return CreatedAtAction(nameof(BuscarPorId), new { id = novoJogoJogado.Id }, novoJogoJogado);
+            try
+            {
+                _jogoJogadoService.Incluir(novoJogoJogado);
+                return CreatedAtAction(nameof(BuscarPorId), new { id = novoJogoJogado.Id }, novoJogoJogado);
+            }
+            catch (ObjectNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
         //JogoJogado Atualizar(JogoJogado jogoJogado);
         [HttpPut]
