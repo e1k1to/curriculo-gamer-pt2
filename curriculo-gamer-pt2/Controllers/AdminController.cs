@@ -37,41 +37,35 @@ namespace curriculo_gamer_pt2.Controllers
         {
             var usuarios = _userService.Listar();
             return Ok(
-                usuarios.Select(usuario => new SimpleUserQuery {
+                usuarios.Where(usuario => usuario.Role == "Admin").Select(usuario => new SimpleUserQuery {
                     Nome = usuario.Nome,
                     Email = usuario.Email,
+                    Role = usuario.Role,
                 }).ToList()
             );
         }
 
-        //User? BuscarPorId(int id);
-        [HttpGet("{id}")]
-        public IActionResult BuscarPorId(int id)
+        [HttpPost("register")]
+        public IActionResult Registrar([FromBody] RegistroDto registroDto)
         {
-            var usuario = _userService.BuscarPorId(id);
-            if (usuario == null)
+            if (HashPassword(registroDto.Senha) != HashPassword(registroDto.ConfirmarSenha))
             {
-                return NotFound();
+                return BadRequest("As senhas não coincidem.");
             }
-            return Ok(new UserQuery {
-                Nome = usuario.Nome,
-                Email = usuario.Email,
-                JogosJogados = _jogoJogadoService.Listar()!
-                    .Where(a => a.UserId == usuario.Id)
-                    .Select(b =>
-                    {
-                        var jogo = _jogoService.BuscarPorId(b.JogoId);
-                        return new JogoJogadoQuery
-                        {
-                            Nome = jogo?.Nome ?? "Não encontrado",
-                            Descricao = jogo?.Descricao ?? "Não encontrado",
-                            HorasJogadas = b.HorasJogadas,
-                            StatusJogo = b.StatusJogo.ToString()
-                        };
-                    }).ToList()
 
-            });
+            User user = new User
+            {
+                Nome = registroDto.Nome,
+                Email = registroDto.Email,
+                Senha = HashPassword(registroDto.Senha),
+                Role = "Admin"
+            };
+
+            var novoUsuario = _userService.Incluir(user);
+
+            return CreatedAtAction(nameof(Registrar), new { id = novoUsuario.Id }, novoUsuario);
         }
+
         //User Atualizar(User user);
         [HttpPut]
         public IActionResult AtualizarUsuario([FromBody] UserDto userDto)
@@ -92,6 +86,7 @@ namespace curriculo_gamer_pt2.Controllers
                 return NotFound();
             }
         }
+
         //bool Deletar(int id);
         [HttpDelete("{id}")]
         public IActionResult DeletarUsuario(int id)

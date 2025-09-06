@@ -34,11 +34,22 @@ namespace curriculo_gamer_pt2.Controllers
             {
                 return Unauthorized("Email ou senha inválidos.");
             }
+
             string token = _userService.GerarTokenJwt(usuario);
+
+            Response.Cookies.Append("X-Access-Token", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
+            });
+
             return Ok(new UserLogado
             {
                 Email = usuario.Email,
-                Token = token
+                Token = token,
+                Role =  usuario.Role
             });
         }
 

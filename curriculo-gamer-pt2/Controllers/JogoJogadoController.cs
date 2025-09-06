@@ -9,7 +9,7 @@ namespace curriculo_gamer_pt2.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "User, Admin")]
     public class JogoJogadoController : ControllerBase
     {
         private readonly IJogoJogadoService _jogoJogadoService;

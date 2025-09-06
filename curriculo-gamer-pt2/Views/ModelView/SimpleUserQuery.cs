@@ -7,5 +7,6 @@ namespace curriculo_gamer_pt2.Views.ModelView
     {
         public string Nome { get; set; } = default!;
         public string Email { get; set; } = default!;
+        public string Role { get; set; } = default!;
     }
 }

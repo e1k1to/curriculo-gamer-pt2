@@ -36,9 +36,11 @@ namespace curriculo_gamer_pt2.Controllers
         {
             var usuarios = _userService.Listar();
             return Ok(
-                usuarios.Select(usuario => new SimpleUserQuery {
+                usuarios.Select(usuario => new SimpleUserQuery
+                {
                     Nome = usuario.Nome,
                     Email = usuario.Email,
+                    Role = usuario.Role,
                 }).ToList()
             );
         }
@@ -54,6 +56,7 @@ namespace curriculo_gamer_pt2.Controllers
             }
             return Ok(new UserQuery {
                 Nome = usuario.Nome,
+                Role = usuario.Role,
                 Email = usuario.Email,
                 JogosJogados = _jogoJogadoService.Listar()!
                     .Where(a => a.UserId == usuario.Id)
