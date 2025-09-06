@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.CodeAnalysis;
 
 namespace curriculo_gamer_pt2.Models.Entities
 {
-    public class User
+    public class Admin
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,8 +19,7 @@ namespace curriculo_gamer_pt2.Models.Entities
         public string Senha { get; set; } = default!;
 
         [Required]
-        [NotNull]
-        public string Role { get; set; } = "User";
+        public readonly string Role = "Admin";
 
         ICollection<JogoJogado> JogosJogados { get; set; } = default!;
         

@@ -30,6 +30,7 @@ namespace curriculo_gamer_pt2.Services
             var claims = new List<Claim>()
             {
                 new Claim("Email", user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(
@@ -58,6 +59,17 @@ namespace curriculo_gamer_pt2.Services
             return _context.Users.Find(id);
         }
 
+        public User? BuscarPorEmail(string email)
+        {
+            return _context.Users.FirstOrDefault(a => a.Email == email);
+        }
+        public User Incluir(User user)
+        {
+            _context.Users.Add(user);
+            _context.SaveChanges();
+            return user;
+        }
+
         public bool Deletar(int id)
         {
             User? usuarioBuscado = BuscarPorId(id);
@@ -66,13 +78,6 @@ namespace curriculo_gamer_pt2.Services
             _context.Users.Remove(usuarioBuscado);
             _context.SaveChanges();
             return true;
-        }
-
-        public User Incluir(User user)
-        {
-            _context.Users.Add(user);
-            _context.SaveChanges();
-            return user;
         }
 
         public List<User> Listar()

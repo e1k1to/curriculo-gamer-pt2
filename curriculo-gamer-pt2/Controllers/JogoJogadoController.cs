@@ -2,12 +2,14 @@
 using curriculo_gamer_pt2.Models.DTOs;
 using curriculo_gamer_pt2.Models.Entities;
 using curriculo_gamer_pt2.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace curriculo_gamer_pt2.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize(Roles = "User")]
     public class JogoJogadoController : ControllerBase
     {
         private readonly IJogoJogadoService _jogoJogadoService;

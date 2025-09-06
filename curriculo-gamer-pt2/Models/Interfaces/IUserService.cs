@@ -4,11 +4,12 @@ namespace curriculo_gamer_pt2.Models.Interfaces
 {
     public interface IUserService
     {
-        User Incluir(User user);
         List<User> Listar();
         User? BuscarPorId(int id);
         User Atualizar(User user);
+        User BuscarPorEmail(string email);
         bool Deletar(int id);
+        User Incluir(User user);
         string GerarTokenJwt(User usuario);
     }
 }

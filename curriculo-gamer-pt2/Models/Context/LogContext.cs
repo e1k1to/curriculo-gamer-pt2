@@ -5,8 +5,15 @@ namespace curriculo_gamer_pt2.Models.Context
 {
     public class LogContext : DbContext
     {
-        public LogContext(DbContextOptions<LogContext> options) : base(options) { }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<User>()
+                .Property(u => u.Role)
+                .HasDefaultValue("User");
+        }
+
+        public LogContext(DbContextOptions<LogContext> options) : base(options) { }
         public DbSet<Jogo> Jogos { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<JogoJogado> JogosJogados { get; set; }

@@ -5,6 +5,7 @@ using curriculo_gamer_pt2.Models.Enums;
 using curriculo_gamer_pt2.Models.Interfaces;
 using curriculo_gamer_pt2.Services;
 using curriculo_gamer_pt2.Views.ModelView;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Text;
@@ -13,12 +14,12 @@ namespace curriculo_gamer_pt2.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IJogoJogadoService _jogoJogadoService;
         private readonly IJogoService _jogoService;
-        public UserController(IUserService userService, IJogoJogadoService jogoJogadoService, IJogoService jogoService)
+        public AdminController(IUserService userService, IJogoJogadoService jogoJogadoService, IJogoService jogoService)
         {
             _userService = userService;
             _jogoJogadoService = jogoJogadoService;
@@ -93,15 +94,11 @@ namespace curriculo_gamer_pt2.Controllers
         }
         //bool Deletar(int id);
         [HttpDelete("{id}")]
-        public IActionResult DeletarUsuario(int id, string senha)
+        public IActionResult DeletarUsuario(int id)
         {
-            var usuario = _userService.BuscarPorId(id);
-
-            if(usuario == null || usuario.Senha != HashPassword(senha))
-                return NotFound();
-
             var sucesso = _userService.Deletar(id);
-
+            if(!sucesso)
+                return NotFound();
             return NoContent();
         }
 

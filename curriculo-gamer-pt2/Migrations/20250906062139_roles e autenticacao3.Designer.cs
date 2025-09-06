@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using curriculo_gamer_pt2.Models.Context;
 
@@ -10,9 +11,11 @@ using curriculo_gamer_pt2.Models.Context;
 namespace curriculo_gamer_pt2.Migrations
 {
     [DbContext(typeof(LogContext))]
-    partial class LogContextModelSnapshot : ModelSnapshot
+    [Migration("20250906062139_roles e autenticacao3")]
+    partial class roleseautenticacao3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,9 +95,7 @@ namespace curriculo_gamer_pt2.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("longtext")
-                        .HasDefaultValue("User");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Senha")
                         .IsRequired()
