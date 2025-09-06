@@ -7,6 +7,7 @@ using curriculo_gamer_pt2.Services;
 using curriculo_gamer_pt2.Views.ModelView;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using System.Text;
 
 namespace curriculo_gamer_pt2.Controllers
 {
@@ -24,28 +25,15 @@ namespace curriculo_gamer_pt2.Controllers
             _jogoService = jogoService;
         }
 
+        private static string HashPassword(string password)
+        {
+            return Convert.ToBase64String(System.Security.Cryptography.SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(password)));
+        }
+
         //List<User> Listar();
         [HttpGet]
         public IActionResult ListarUsuarios()
         {
-            /*new UserQuery {
-                Nome = usuario.Nome,
-                Email = usuario.Email,
-                JogosJogados = _jogoJogadoService.Listar()
-                    .Where(a => a.UserId == usuario.Id)
-                    .Select(b =>
-                    {
-                        var jogo = _jogoService.BuscarPorId(b.JogoId);
-                        return new JogoJogadoQuery
-                        {
-                            Nome = jogo?.Nome ?? "Nao encontrado",
-                            Descricao = jogo?.Descricao ?? "Nao encontrado",
-                            HorasJogadas = b.HorasJogadas,
-                            StatusJogo = b.StatusJogo.ToString()
-                        };
-                    }).ToList()
-
-            }*/
             var usuarios = _userService.Listar();
             return Ok(
                 usuarios.Select(usuario => new SimpleUserQuery {
@@ -63,7 +51,7 @@ namespace curriculo_gamer_pt2.Controllers
             {
                 Nome = userDto.Nome,
                 Email = userDto.Email,
-                Senha = userDto.Senha
+                Senha = HashPassword(userDto.Senha)
             };
             var novoUsuario = _userService.Incluir(user);
             return CreatedAtAction(nameof(IncluirUsuario), new { id = novoUsuario.Id }, novoUsuario);
@@ -81,15 +69,15 @@ namespace curriculo_gamer_pt2.Controllers
             return Ok(new UserQuery {
                 Nome = usuario.Nome,
                 Email = usuario.Email,
-                JogosJogados = _jogoJogadoService.Listar()
+                JogosJogados = _jogoJogadoService.Listar()!
                     .Where(a => a.UserId == usuario.Id)
                     .Select(b =>
                     {
                         var jogo = _jogoService.BuscarPorId(b.JogoId);
                         return new JogoJogadoQuery
                         {
-                            Nome = jogo?.Nome ?? "Nao encontrado",
-                            Descricao = jogo?.Descricao ?? "Nao encontrado",
+                            Nome = jogo?.Nome ?? "Não encontrado",
+                            Descricao = jogo?.Descricao ?? "Não encontrado",
                             HorasJogadas = b.HorasJogadas,
                             StatusJogo = b.StatusJogo.ToString()
                         };
@@ -106,7 +94,7 @@ namespace curriculo_gamer_pt2.Controllers
                 Id = userDto.Id,
                 Nome = userDto.Nome,
                 Email = userDto.Email,
-                Senha = userDto.Senha
+                Senha = HashPassword(userDto.Senha)
             };
             try
             {
@@ -131,7 +119,7 @@ namespace curriculo_gamer_pt2.Controllers
         public IActionResult Login([FromBody] LoginDto loginDto)
         {
             var usuarios = _userService.Listar();
-            var usuario = usuarios.FirstOrDefault(u => u.Email == loginDto.Email && u.Senha == loginDto.Senha);
+            var usuario = usuarios.FirstOrDefault(u => u.Email == loginDto.Email && u.Senha == HashPassword(loginDto.Senha));
             if (usuario == null)
             {
                 return Unauthorized("Email ou senha inválidos.");
