@@ -1,7 +1,10 @@
 ﻿using curriculo_gamer_pt2.Exceptions;
 using curriculo_gamer_pt2.Models.DTOs;
 using curriculo_gamer_pt2.Models.Entities;
+using curriculo_gamer_pt2.Models.Enums;
 using curriculo_gamer_pt2.Models.Interfaces;
+using curriculo_gamer_pt2.Services;
+using curriculo_gamer_pt2.Views.ModelView;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
@@ -12,16 +15,44 @@ namespace curriculo_gamer_pt2.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IJogoJogadoService _jogoJogadoService;
+        private readonly IJogoService _jogoService;
+        public UserController(IUserService userService, IJogoJogadoService jogoJogadoService, IJogoService jogoService)
         {
             _userService = userService;
+            _jogoJogadoService = jogoJogadoService;
+            _jogoService = jogoService;
         }
+
         //List<User> Listar();
         [HttpGet]
         public IActionResult ListarUsuarios()
         {
+            /*new UserQuery {
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                JogosJogados = _jogoJogadoService.Listar()
+                    .Where(a => a.UserId == usuario.Id)
+                    .Select(b =>
+                    {
+                        var jogo = _jogoService.BuscarPorId(b.JogoId);
+                        return new JogoJogadoQuery
+                        {
+                            Nome = jogo?.Nome ?? "Nao encontrado",
+                            Descricao = jogo?.Descricao ?? "Nao encontrado",
+                            HorasJogadas = b.HorasJogadas,
+                            StatusJogo = b.StatusJogo.ToString()
+                        };
+                    }).ToList()
+
+            }*/
             var usuarios = _userService.Listar();
-            return Ok(usuarios);
+            return Ok(
+                usuarios.Select(usuario => new SimpleUserQuery {
+                    Nome = usuario.Nome,
+                    Email = usuario.Email,
+                }).ToList()
+            );
         }
 
         //User Incluir(User user);
@@ -47,7 +78,24 @@ namespace curriculo_gamer_pt2.Controllers
             {
                 return NotFound();
             }
-            return Ok(usuario);
+            return Ok(new UserQuery {
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                JogosJogados = _jogoJogadoService.Listar()
+                    .Where(a => a.UserId == usuario.Id)
+                    .Select(b =>
+                    {
+                        var jogo = _jogoService.BuscarPorId(b.JogoId);
+                        return new JogoJogadoQuery
+                        {
+                            Nome = jogo?.Nome ?? "Nao encontrado",
+                            Descricao = jogo?.Descricao ?? "Nao encontrado",
+                            HorasJogadas = b.HorasJogadas,
+                            StatusJogo = b.StatusJogo.ToString()
+                        };
+                    }).ToList()
+
+            });
         }
         //User Atualizar(User user);
         [HttpPut]
@@ -79,5 +127,21 @@ namespace curriculo_gamer_pt2.Controllers
             return NoContent();
         }
 
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginDto loginDto)
+        {
+            var usuarios = _userService.Listar();
+            var usuario = usuarios.FirstOrDefault(u => u.Email == loginDto.Email && u.Senha == loginDto.Senha);
+            if (usuario == null)
+            {
+                return Unauthorized("Email ou senha inválidos.");
+            }
+            string token = _userService.GerarTokenJwt(usuario);
+            return Ok(new UserLogado
+            {
+                Email = usuario.Email,
+                Token = token
+            });
+        }
     }
 }

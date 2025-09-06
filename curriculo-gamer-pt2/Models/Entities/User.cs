@@ -10,13 +10,13 @@ namespace curriculo_gamer_pt2.Models.Entities
         public int Id { get; set; }
         [Required]
         [StringLength(128)]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = default!;
         [Required]
         [StringLength(128)]
-        public string Email { get; set; }
+        public string Email { get; set; } = default!;
         [Required]
         [StringLength(128)]
-        public string Senha { get; set; }
+        public string Senha { get; set; } = default!;
         ICollection<JogoJogado> JogosJogados { get; set; } = default!;
         
     }

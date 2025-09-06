@@ -7,7 +7,7 @@ namespace curriculo_gamer_pt2.Models.DTOs
         public int Id { get; set; }
         public int JogoId { get; set; }
         public int UserId { get; set; }
-        public StatusJogo StatusJogo { get; set; }
+        public StatusJogoEnum StatusJogo { get; set; }
         public int HorasJogadas { get; set; }
     }
 }

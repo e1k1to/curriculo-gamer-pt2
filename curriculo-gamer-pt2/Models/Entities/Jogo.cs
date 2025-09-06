@@ -11,11 +11,11 @@ namespace curriculo_gamer_pt2.Models.Entities
         public int Id { get; set; }
         [Required]
         [StringLength(128)]
-        public string Nome { get; set; }
+        public string Nome { get; set; } = default!;
         [Required]
         [StringLength(4096)]
-        public string Descricao { get; set; }
+        public string Descricao { get; set; } = default!;
         [Required]
-        public int AnoLancamento { get; set; }
+        public int AnoLancamento { get; set; } = default!;
     }
 }

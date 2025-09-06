@@ -9,5 +9,6 @@ namespace curriculo_gamer_pt2.Models.Interfaces
         User? BuscarPorId(int id);
         User Atualizar(User user);
         bool Deletar(int id);
+        string GerarTokenJwt(User usuario);
     }
 }

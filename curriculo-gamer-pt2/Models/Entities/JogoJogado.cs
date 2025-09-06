@@ -10,12 +10,12 @@ namespace curriculo_gamer_pt2.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public int JogoId { get; set; }
+        public int JogoId { get; set; } = default!;
         [Required]
-        public int UserId { get; set; }
+        public int UserId { get; set; } = default!;
         [Required]
-        public StatusJogo StatusJogo { get; set; }
+        public StatusJogoEnum StatusJogo { get; set; } = default!;
         [Required]
-        public int HorasJogadas { get; set; }
+        public int HorasJogadas { get; set; } = default!;
     }
 }
