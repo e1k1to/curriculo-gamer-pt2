@@ -3,6 +3,7 @@ using curriculo_gamer_pt2.Models.Entities;
 using curriculo_gamer_pt2.Models.Interfaces;
 using curriculo_gamer_pt2.Views.ModelView;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 
@@ -24,15 +25,33 @@ namespace curriculo_gamer_pt2.Controllers
             return Convert.ToBase64String(System.Security.Cryptography.SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(password)));
         }
 
-        [HttpPost("login")]
-        
-        public IActionResult Login([FromBody] LoginDto loginDto)
+        [HttpGet("login")]
+        public IActionResult Login()
         {
+            if(User.Identity.IsAuthenticated)
+            {
+                return View("JaLogado");
+            }
+            return View();
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("X-Access-Token");
+            return Redirect("Home");
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login([FromForm] LoginDto loginDto)
+        {
+            if (loginDto == null)
+                return Ok("oi");
             var usuarios = _userService.Listar();
             var usuario = usuarios.FirstOrDefault(u => u.Email == loginDto.Email && u.Senha == HashPassword(loginDto.Senha));
             if (usuario == null)
             {
-                return Unauthorized("Email ou senha inválidos.");
+                return View("LoginInvalido");
             }
 
             string token = _userService.GerarTokenJwt(usuario);
@@ -45,20 +64,24 @@ namespace curriculo_gamer_pt2.Controllers
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
 
-            return Ok(new UserLogado
-            {
-                Email = usuario.Email,
-                Token = token,
-                Role =  usuario.Role
-            });
+            return Redirect("Home");
         }
 
         [HttpPost("register")]
-        public IActionResult Registrar([FromBody] RegistroDto registroDto)
+        public IActionResult Registrar([FromForm] RegistroDto registroDto)
         {
             if(HashPassword(registroDto.Senha) != HashPassword(registroDto.ConfirmarSenha))
             {
                 return BadRequest("As senhas não coincidem.");
+            }
+
+            if(_userService.Listar().Any(u => u.Email == registroDto.Email))
+            {
+                return BadRequest("Email já está em uso.");
+            }
+            if(_userService.Listar().Any(u => u.Nome == registroDto.Nome))
+            {
+                return BadRequest("Nome de usuário já está em uso.");
             }
 
             User user = new User

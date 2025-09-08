@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1>Login</h1>
+@model curriculo_gamer_pt2.Models.DTOs.LoginDto
+<form method="post" asp-action="Login" asp-controller="Auth">
+    <div>
+        <label asp-for="Email">E-mail</label>
+        <input type="email" asp-for="Email" required placeholder="Email" />
+        <label asp-for="Senha" >Senha</label>
+        <input type="password" asp-for="Senha" required placeholder="Senha" />
+        <button class="btn btn-primary" type="submit">Entrar</button>
+    </div>
+</form>
