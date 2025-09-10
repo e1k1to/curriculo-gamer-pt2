@@ -33,7 +33,9 @@ namespace curriculo_gamer_pt2.Services
 
         public Jogo? BuscarPorId(int id)
         {
-            return _context.Jogos.Find(id);
+            return _context.Jogos
+                .Include(j => j.Categorias) // Inclui as categorias relacionadas
+                .FirstOrDefault(j => j.Id == id);
         }
 
         public bool Deletar(int id)
@@ -51,6 +53,16 @@ namespace curriculo_gamer_pt2.Services
             _context.Add(jogo);
             _context.SaveChanges();
             return jogo;
+        }
+
+        public void AtualizarCategorias(Jogo jogo, List<Categoria> categorias)
+        {
+            jogo.Categorias.Clear();
+            foreach (var categoria in categorias)
+            {
+                jogo.Categorias.Add(categoria);
+            }
+            _context.SaveChanges();
         }
     }
 }

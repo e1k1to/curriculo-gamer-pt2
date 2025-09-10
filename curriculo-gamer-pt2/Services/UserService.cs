@@ -30,6 +30,7 @@ namespace curriculo_gamer_pt2.Services
             var claims = new List<Claim>()
             {
                 new Claim("Email", user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role)
             };
 

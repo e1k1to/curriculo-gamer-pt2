@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Jogos";
+}
+
+@model curriculo_gamer_pt2.Models.Entities.Jogo
+<h1>@Model.Nome</h1>
+<h5>Categorias: 
+    @foreach (var categoria in Model.Categorias) {
+        <span>@categoria.Nome</span>
+    }
+</h5>
+<h6>Ano de Lançamento: @Model.AnoLancamento</h6>
+<h3>Descrição:</h3> 
+<h5>@Model.Descricao</h5>

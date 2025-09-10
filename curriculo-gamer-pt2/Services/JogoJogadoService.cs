@@ -2,6 +2,7 @@
 using curriculo_gamer_pt2.Models.Context;
 using curriculo_gamer_pt2.Models.Entities;
 using curriculo_gamer_pt2.Models.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace curriculo_gamer_pt2.Services
 {
@@ -64,9 +65,12 @@ namespace curriculo_gamer_pt2.Services
             return jogoJogado;
         }
 
-        public List<JogoJogado> Listar()
+        public List<JogoJogado> GetJogoJogadoUsuario(int userId)
         {
-            return _context.JogosJogados.ToList();
+            return _context.JogosJogados
+                .Include(jj => jj.Jogo)
+                .Where(jj => jj.UserId == userId)
+                .ToList();
         }
     }
 }

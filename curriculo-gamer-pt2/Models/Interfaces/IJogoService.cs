@@ -9,5 +9,6 @@ namespace curriculo_gamer_pt2.Models.Interfaces
         Jogo? BuscarPorId(int id);
         Jogo Atualizar(Jogo jogo);
         bool Deletar(int id);
+        void AtualizarCategorias(Jogo jogo, List<Categoria> categorias);
     }
 }

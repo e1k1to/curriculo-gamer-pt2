@@ -23,7 +23,7 @@ namespace curriculo_gamer_pt2.Models.Entities
         [NotNull]
         public string Role { get; set; } = "User";
 
-        ICollection<JogoJogado> JogosJogados { get; set; } = default!;
-        
+        public ICollection<JogoJogado> JogosJogados { get; set; } = new List<JogoJogado>();
+
     }
 }

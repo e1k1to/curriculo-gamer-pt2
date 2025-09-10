@@ -53,6 +53,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<IJogoService, JogoService>();
 builder.Services.AddScoped<IJogoJogadoService, JogoJogadoService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 
 builder.Services.AddAuthentication(options =>
 {

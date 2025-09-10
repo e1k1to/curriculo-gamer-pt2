@@ -2,21 +2,25 @@
 using curriculo_gamer_pt2.Models.DTOs;
 using curriculo_gamer_pt2.Models.Entities;
 using curriculo_gamer_pt2.Models.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace curriculo_gamer_pt2.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class JogoController : ControllerBase
+    public class JogoController : Controller
     {
         private readonly IJogoService _jogoService;
-        public JogoController(IJogoService jogoService)
+        private readonly ICategoriaService _categoriaService;
+        public JogoController(IJogoService jogoService, ICategoriaService catagoriaService)
         {
             _jogoService = jogoService;
+            _categoriaService = catagoriaService;
         }
 
         //Jogo? BuscarPorId(int id);
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -25,29 +29,44 @@ namespace curriculo_gamer_pt2.Controllers
             {
                 return NotFound();
             }
-            return Ok(resposta);
+            return View(resposta);
         }
 
         //Jogo Incluir(Jogo jogo);
         [HttpPost]
-        public IActionResult AddJogo([FromBody] JogoDto jogoDto)
+        public IActionResult AddJogo([FromBody] CriarJogoDto jogoDto)
         {
+
+            var categorias = _categoriaService.BuscarPorIds(jogoDto.CategoriaIds);
+            if (categorias.Count != jogoDto.CategoriaIds.Count)
+                return BadRequest("Uma ou mais categorias não foram encontradas.");
+
             Jogo jogo = new Jogo
             {
                 Nome = jogoDto.Nome,
                 Descricao = jogoDto.Descricao,
-                AnoLancamento = jogoDto.AnoLancamento
+                AnoLancamento = jogoDto.AnoLancamento,
+                Categorias = categorias
             };
             _jogoService.Incluir(jogo);
-            return CreatedAtAction(nameof(GetById), new { id = jogo.Id }, jogo);
+            return CreatedAtAction(nameof(GetById), new { id = jogo.Id }, 
+                new JogoDto
+                {
+                    Nome = jogo.Nome,
+                    Descricao = jogo.Descricao,
+                    AnoLancamento = jogo.AnoLancamento,
+                    Categorias = jogo.Categorias.Select(c => c.Nome).ToList()
+                }
+                );
         }
 
         //List<Jogo> ListarTodos();
+        [AllowAnonymous]
         [HttpGet]
-        public IActionResult ListarTodos()
+        public IActionResult ListarJogos()
         {
-            var lista = _jogoService.ListarTodos();
-            return Ok(lista);
+            List<Jogo> jogos = _jogoService.ListarTodos();
+            return View(jogos);
         }
 
         //bool Deletar(int id);
@@ -61,20 +80,32 @@ namespace curriculo_gamer_pt2.Controllers
         }
         //Jogo Atualizar(Jogo jogo);
         [HttpPut]
-        public IActionResult UpdateJogo([FromBody] JogoDto jogoDto)
+        public IActionResult UpdateJogo([FromBody] CriarJogoDto jogoDto)
         {
+
+            var categorias = _categoriaService.BuscarPorIds(jogoDto.CategoriaIds);
+
+            if(categorias.Count != jogoDto.CategoriaIds.Count)
+                return BadRequest("Uma ou mais categorias não foram encontradas.");
+
             Jogo jogo = new Jogo
             {
-                Id = jogoDto.Id,
                 Nome = jogoDto.Nome,
                 Descricao = jogoDto.Descricao,
-                AnoLancamento = jogoDto.AnoLancamento
+                AnoLancamento = jogoDto.AnoLancamento,
+                Categorias = categorias
             };
 
             try
             {
                 var jogoAtualizado = _jogoService.Atualizar(jogo);
-                return Ok(jogoAtualizado);
+                return Ok(new JogoDto
+                {
+                    Nome = jogo.Nome,
+                    Descricao = jogo.Descricao,
+                    AnoLancamento = jogo.AnoLancamento,
+                    Categorias = jogo.Categorias.Select(c => c.Nome).ToList()
+                });
             }
             catch (ObjectNotFoundException)
             {
@@ -82,5 +113,23 @@ namespace curriculo_gamer_pt2.Controllers
             }
             
         }
+
+        [HttpPut("{id}/categorias")]
+        public IActionResult AtualizarCategorias(int id, [FromBody] AtualizarCategoriaDto atualizarCategoriaDto)
+        {
+            var jogo = _jogoService.BuscarPorId(id);
+
+            if(jogo == null)
+                return NotFound("Jogo não encontrado");
+
+            var categorias = _categoriaService.BuscarPorIds(atualizarCategoriaDto.CategoriaIds);
+
+            _jogoService.AtualizarCategorias(jogo, categorias);
+
+            return Ok(jogo);
+
+        }
+
+
     }
 }

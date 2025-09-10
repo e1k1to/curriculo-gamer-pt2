@@ -17,5 +17,7 @@ namespace curriculo_gamer_pt2.Models.Entities
         public string Descricao { get; set; } = default!;
         [Required]
         public int AnoLancamento { get; set; } = default!;
+        
+        public ICollection<Categoria> Categorias { get; set; } = new List<Categoria>();
     }
 }

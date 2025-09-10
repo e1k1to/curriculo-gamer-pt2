@@ -17,5 +17,8 @@ namespace curriculo_gamer_pt2.Models.Entities
         public StatusJogoEnum StatusJogo { get; set; } = default!;
         [Required]
         public int HorasJogadas { get; set; } = default!;
+
+        public User User { get; set; } = default!;
+        public Jogo Jogo { get; set; } = default!;
     }
 }
