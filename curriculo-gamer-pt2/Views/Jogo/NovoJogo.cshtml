@@ -1,0 +1,37 @@
+﻿@using curriculo_gamer_pt2.Models.Entities
+@{
+    ViewData["Title"] = "Jogos";
+}
+
+@model curriculo_gamer_pt2.Models.DTOs.CriarJogoDto
+<h1>Adicionar novo jogo: </h1>
+<form method="post" asp-action="AddJogo" asp-controller="Jogo">
+    <!--         public string Nome { get; set; }-->
+    <div class="form-group">
+    <label for="NomeJogo">Nome do jogo: </label>
+    <input type="text" class="form-control" id="NomeJogo" asp-for="Nome" required placeholder="Nome do jogo..." />
+    </div>
+    <!-- public string Descricao { get; set; } -->
+    <div class="form-group">
+    <label for="DescricaoJogo">Descricao do jogo: </label>
+    <input type="text" class="form-control" id="DescricaoJogo" asp-for="Descricao" required placeholder="Descricao do jogo..." />
+    </div>
+    <!-- public int AnoLancamento { get; set; } -->
+    <div class="form-group">
+    <label for="AnoLancamento">Ano de lancamento do jogo: </label>
+    <input type="number" min="1500" max="2100" class="form-control" id="AnoLancamento" asp-for="AnoLancamento" required />
+    </div>
+    <!-- public List<string> Categorias { get; set; } = new List<string>(); -->
+    <div class="form-group">
+        <label for="itens">Categorias: </label>
+        <select class="form-control" asp-for="IdsCategorias" id="itens" multiple>
+            @foreach(var categoria in (IEnumerable<Categoria>)ViewBag.Categorias)
+            {
+                <option value="@categoria.Id">@categoria.Nome</option>
+            }
+        </select>
+    </div>
+    <input type="submit" class="btn mt-3 btn-primary" value="Adicionar Jogo" />
+
+</form>
+

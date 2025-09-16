@@ -9,5 +9,7 @@ namespace curriculo_gamer_pt2.Models.Interfaces
         Categoria? BuscarPorId(int id);
         bool Deletar(int id);
         List<Categoria> BuscarPorIds(List<int> categoriaIds);
+        Categoria? BuscarPorNome(string nome);
+        List<Categoria> BuscarPorNomes(List<string> nomes);
     }
 }

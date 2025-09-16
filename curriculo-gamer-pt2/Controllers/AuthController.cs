@@ -46,7 +46,7 @@ namespace curriculo_gamer_pt2.Controllers
         public IActionResult Login([FromForm] LoginDto loginDto)
         {
             if (loginDto == null)
-                return Ok("oi");
+                return BadRequest("Dados incompletos");
             var usuarios = _userService.Listar();
             var usuario = usuarios.FirstOrDefault(u => u.Email == loginDto.Email && u.Senha == HashPassword(loginDto.Senha));
             if (usuario == null)

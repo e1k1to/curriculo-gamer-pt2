@@ -2,6 +2,7 @@
 using curriculo_gamer_pt2.Models.Context;
 using curriculo_gamer_pt2.Models.Entities;
 using curriculo_gamer_pt2.Models.Interfaces;
+using System.Net;
 
 namespace curriculo_gamer_pt2.Services
 {
@@ -47,6 +48,18 @@ namespace curriculo_gamer_pt2.Services
         public List<Categoria> BuscarPorIds(List<int> ids)
         {
             return _context.Categorias.Where(c => ids.Contains(c.Id)).ToList();
+        }
+
+        public Categoria? BuscarPorNome(string nome)
+        {
+            var categoria = _context.Categorias.Where(c => c.Nome == nome).FirstOrDefault();
+            return categoria;
+        }
+
+        public List<Categoria> BuscarPorNomes(List<string> nomes)
+        {
+            var categorias = _context.Categorias.Where(c => nomes.Any(x => x.Contains(c.Nome))).ToList();
+            return categorias;
         }
     }
 }

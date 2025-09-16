@@ -15,6 +15,6 @@ namespace curriculo_gamer_pt2.Models.DTOs
 
         [Required(ErrorMessage = "É obrigatório selecionar pelo menos uma categoria.")]
         [MinLength(1)]
-        public List<int> CategoriaIds { get; set; } = new List<int>();
+        public List<int> IdsCategorias { get; set; } = new List<int>();
     }
 }
