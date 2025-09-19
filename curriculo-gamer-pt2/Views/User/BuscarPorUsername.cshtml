@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Jogos";
+}
+
+<h1>@ViewBag.Dados.Usuario.Nome</h1>
+<h3>Jogos Jogados: </h3>
+@foreach (var jogoJogado in ViewBag.Dados.JogosJogados) {
+    <div style="border-style:solid; border-width:1px;">
+        <p class="h5"><strong>Nome do jogo:</strong> @jogoJogado.Nome</p>
+        <p><strong>Status de Jogo:</strong> @jogoJogado.StatusJogo</p>
+        <p><strong>Horas Jogadas:</strong> @jogoJogado.HorasJogadas</p>
+    </div>
+}

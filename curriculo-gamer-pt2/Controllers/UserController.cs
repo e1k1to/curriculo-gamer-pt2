@@ -5,7 +5,9 @@ using curriculo_gamer_pt2.Models.Enums;
 using curriculo_gamer_pt2.Models.Interfaces;
 using curriculo_gamer_pt2.Services;
 using curriculo_gamer_pt2.Views.ModelView;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Security.Claims;
 using System.Text;
@@ -14,7 +16,7 @@ namespace curriculo_gamer_pt2.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly IUserService _userService;
         private readonly IJogoJogadoService _jogoJogadoService;
@@ -46,34 +48,31 @@ namespace curriculo_gamer_pt2.Controllers
             );
         }
 
-        //User? BuscarPorId(int id);
-        [HttpGet("{id}")]
-        public IActionResult BuscarPorId(int id)
+        [AllowAnonymous]
+        [HttpGet("{username}")]
+        public IActionResult BuscarPorUsername(string username)
         {
-            var usuario = _userService.BuscarPorId(id);
+            var usuario = _userService.BuscarPorUsername(username);
+            
             if (usuario == null)
             {
                 return NotFound();
             }
-            return Ok(new UserQuery {
-                Nome = usuario.Nome,
-                Role = usuario.Role,
-                Email = usuario.Email,
-                JogosJogados = _jogoJogadoService.GetJogoJogadoUsuario(id)!
-                    .Select(b =>
-                    {
-                        var jogo = _jogoService.BuscarPorId(b.JogoId);
-                        return new JogoJogadoQuery
-                        {
-                            Nome = jogo?.Nome ?? "Não encontrado",
-                            Descricao = jogo?.Descricao ?? "Não encontrado",
-                            HorasJogadas = b.HorasJogadas,
-                            StatusJogo = b.StatusJogo.ToString()
-                        };
-                    }).ToList()
 
+            var jogosJogados = _jogoJogadoService.GetJogoJogadoUsuario(usuario.Id).Select( jj => new JogoJogadoQuery
+            {
+                Nome = jj.Jogo.Nome,
+                Descricao = jj.Jogo.Descricao,
+                HorasJogadas = jj.HorasJogadas,
+                StatusJogo = jj.StatusJogo.ToString()
             });
+
+
+            ViewBag.Dados = new {Usuario = usuario, JogosJogados = jogosJogados };
+            return View();
+
         }
+
         //User Atualizar(User user);
         [HttpPut]
         public IActionResult AtualizarUsuario([FromBody] UserDto userDto)
@@ -108,9 +107,18 @@ namespace curriculo_gamer_pt2.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}/jogos")]
-        public IActionResult ListarJogosJogados(int id)
+        [HttpGet("{username}/jogos")]
+        public IActionResult ListarJogosJogados(string username)
         {
+            var user = _userService.BuscarPorUsername(username);
+
+            if(user == null)
+            {
+                return NotFound(new { message = "Usuário não encontrado." });
+            }
+
+            var id = user.Id;
+
             var lista = _jogoJogadoService.GetJogoJogadoUsuario(id);
 
             var jogosJogados = lista.Select(jj => new JogoJogadoQuery
@@ -124,15 +132,23 @@ namespace curriculo_gamer_pt2.Controllers
             return Ok(jogosJogados);
         }
 
-        [HttpPost("{id}/jogos")]
-        public IActionResult AdicionarJogoJogado(int id, [FromBody] AdicionarJogoJogadoDto jogoJogadoDto)
+        [HttpPost("{username}/jogos")]
+        public IActionResult AdicionarJogoJogado(string username, [FromBody] AdicionarJogoJogadoDto jogoJogadoDto)
         {
-            if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
+
+            var user = _userService.BuscarPorUsername(username);
+
+            if(user == null)
+            {
+                return NotFound(new { message = "Usuário não encontrado." });
+            }
+
+            if (User.FindFirstValue(ClaimTypes.NameIdentifier) != user.Id.ToString())
             {
                 return Forbid();
             }
 
-            if (_jogoJogadoService.GetJogoJogadoUsuario(id)!.Any(jj => jj.JogoId == jogoJogadoDto.JogoId))
+            if (_jogoJogadoService.GetJogoJogadoUsuario(user.Id)!.Any(jj => jj.JogoId == jogoJogadoDto.JogoId))
             {
                 return Conflict(new { message = "Jogo já adicionado ao usuário." });
             }
@@ -140,7 +156,7 @@ namespace curriculo_gamer_pt2.Controllers
             JogoJogado novoJogoJogado = new JogoJogado
             {
                 JogoId = jogoJogadoDto.JogoId,
-                UserId = id,
+                UserId = user.Id,
                 HorasJogadas = jogoJogadoDto.HorasJogadas,
                 StatusJogo = jogoJogadoDto.StatusJogo
             };
@@ -148,7 +164,7 @@ namespace curriculo_gamer_pt2.Controllers
             try
             {
                 _jogoJogadoService.Incluir(novoJogoJogado);
-                return CreatedAtAction(nameof(BuscarPorId), new { id = novoJogoJogado.Id }, new JogoJogadoQuery
+                return CreatedAtAction(nameof(BuscarPorUsername), new { id = novoJogoJogado.Id }, new JogoJogadoQuery
                 {
                     Nome = novoJogoJogado.Jogo.Nome,
                     Descricao = novoJogoJogado.Jogo.Descricao,
@@ -163,9 +179,18 @@ namespace curriculo_gamer_pt2.Controllers
 
         }
 
-        [HttpPut("{id}/jogos")]
-        public IActionResult AtualizarJogoJogado(int id, [FromBody] AdicionarJogoJogadoDto jogoJogadoDto)
+        [HttpPut("{username}/jogos")]
+        public IActionResult AtualizarJogoJogado(string username, [FromBody] AdicionarJogoJogadoDto jogoJogadoDto)
         {
+            var user = _userService.BuscarPorUsername(username);
+
+            if(user == null)
+            {
+                return NotFound(new { message = "Usuário não encontrado." });
+            }
+
+            var id = user.Id;
+
             if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
             {
                 return Forbid();
@@ -191,9 +216,18 @@ namespace curriculo_gamer_pt2.Controllers
             });
         }
 
-        [HttpDelete("{id}/jogos/{jogoId}")]
-        public IActionResult DeletarJogoJogado(int id, int jogoId)
+        [HttpDelete("{username}/jogos/{jogoId}")]
+        public IActionResult DeletarJogoJogado(string username, int jogoId)
         {
+            var user =  _userService.BuscarPorUsername(username);
+
+            if(user == null)
+            {
+                return NotFound(new { message = "Usuário não encontrado." });
+            }
+
+            var id = user.Id;
+
             if (User.FindFirstValue(ClaimTypes.NameIdentifier) != id.ToString())
             {
                 return Forbid();

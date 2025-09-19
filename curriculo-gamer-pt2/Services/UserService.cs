@@ -64,6 +64,12 @@ namespace curriculo_gamer_pt2.Services
         {
             return _context.Users.FirstOrDefault(a => a.Email == email);
         }
+
+        public User? BuscarPorUsername(string username)
+        {
+            return _context.Users.FirstOrDefault(a => a.Nome == username);
+        }
+
         public User Incluir(User user)
         {
             _context.Users.Add(user);
@@ -85,6 +91,5 @@ namespace curriculo_gamer_pt2.Services
         {
             return _context.Users.ToList();
         }
-
     }
 }
