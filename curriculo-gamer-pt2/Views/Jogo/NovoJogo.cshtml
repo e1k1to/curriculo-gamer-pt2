@@ -25,7 +25,7 @@
     <!-- public List<string> Categorias { get; set; } = new List<string>(); -->
     <div class="form-group">
         <label for="itens">Categorias: </label>
-        <select class="form-control" asp-for="IdsCategorias" id="itens" multiple>
+        <select class="form-control" asp-for="IdsCategorias" id="itens" multiple="multiple">
             @foreach(var categoria in (IEnumerable<Categoria>)ViewBag.Categorias)
             {
                 <option value="@categoria.Id">@categoria.Nome</option>
@@ -35,4 +35,11 @@
     <input type="submit" class="btn mt-3 btn-primary" value="Adicionar Jogo" />
 
 </form>
+<script>
+$(document).ready(function() {
+    $('#itens').select2( {
+        theme: 'bootstrap'
+    } );
+});
+</script>
 
