@@ -42,6 +42,12 @@ namespace curriculo_gamer_pt2.Controllers
             return Redirect("Home");
         }
 
+        [HttpGet("logout")]
+        public IActionResult LogoutGet()
+        {
+            return View();
+        }
+
         [HttpPost("login")]
         public IActionResult Login([FromForm] LoginDto loginDto)
         {

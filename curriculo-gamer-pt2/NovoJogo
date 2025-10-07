@@ -1,11 +1,11 @@
-﻿@using curriculo_gamer_pt2.Models.Entities
+@using curriculo_gamer_pt2.Models.Enums
 
 @{
     ViewData["Title"] = "Jogos";
 }
 
-<h1>Adicionar jogo:</h1>
-@model curriculo_gamer_pt2.Models.DTOs.CriarJogoDto
+<h1>Adicionar jogo ao curriculo</h1>
+
 <form method="post" asp-action="AddJogo" asp-controller="Jogo">
     <!--         public string Nome { get; set; }-->
     <div class="form-group">

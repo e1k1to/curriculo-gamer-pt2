@@ -1,0 +1,51 @@
+﻿@using curriculo_gamer_pt2.Models.Enums
+
+@{
+    ViewData["Title"] = "Jogos";
+}
+
+@model curriculo_gamer_pt2.Models.DTOs.AdicionarJogoJogadoDto
+
+
+<h1>Adicionar jogo ao curriculo: </h1>
+
+<form method="post" asp-action="AdicionarJogoJogadoPost" asp-controller="User" asp-route-username="@ViewBag.Username">
+    <!--        public int JogoId { get; set; }  -->
+    <div class="form-group">
+    <label for="JogoId">Nome do jogo: </label>
+    <select asp-for="JogoId" class="form-control" id="jogoSelect">
+    @foreach(var jogo in ViewBag.Jogos) 
+    {
+        <option value="@jogo.Id">@jogo.Nome</option>
+    }
+    </select>
+    </div>
+
+
+    <!-- public StatusJogoEnum StatusJogo { get; set; } -->
+    <div class="form-group">
+    <label for="StatusJogo">Status do jogo: </label>
+    <select class="form-control" id="StatusJogo" asp-for="StatusJogo" asp-items="Html.GetEnumSelectList<StatusJogoEnum>()">
+    </select>
+    </div>
+
+
+    <!-- public int HorasJogadas { get; set; } = 0; -->
+    <div class="form-group">
+    <label for="HorasJogadas">Horas jogadas: </label>
+    <input type="number" min="0" max="999999" class="form-control" id="HorasJogadas" asp-for="HorasJogadas" required />
+    </div>
+
+    <input type="submit" class="btn mt-3 btn-primary" value="Adicionar Jogo" />
+
+</form>
+
+<script>
+
+$(document).ready(function() {
+    $('#jogoSelect').select2({
+        placeholder: 'Selecione um jogo:',
+        theme: 'bootstrap'
+    });
+});
+</script>
